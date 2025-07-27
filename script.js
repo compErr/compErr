@@ -1,14 +1,13 @@
-// Navigation state
 let currentItem = 0;
 const menuItems = document.querySelectorAll('.menu-item');
 let isPageLoading = true;
+const fs = require('fs');
+const path = require('path');
 
-// Initialize
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         updateFocus();
         
-        // Focus first item
         if (menuItems.length > 0) {
             menuItems[0].classList.add('focused');
         }
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 });
 
-// Update visual focus
 function updateFocus() {
     menuItems.forEach(item => item.classList.remove('focused'));
     
@@ -26,7 +24,6 @@ function updateFocus() {
     }
 }
 
-// Navigation functions
 function navigateDown() {
     if (isPageLoading) return;
     
@@ -51,19 +48,34 @@ function selectCurrentItem() {
     }
 }
 
-// Handle key actions
+function getLatest() {
+    const dir = "articles";
+
+    
+    return latestFile;
+}
+
+function loadPage(page,type) {
+    if(type == 0){
+        if(page === 'latest-post') {
+            page = getLatest();
+        }
+        window.location.href = `/articles?page=${page}`;
+    }
+}
+
 function handleKeyAction(key) {
     if (isPageLoading) return;
     
     const actions = {
-        '1': () => loadPage('latest-post'),
-        '2': () => loadPage('all-posts'),
-        '3': () => loadPage('tags'),
-        '4': () => loadPage('search'),
-        'g': () => window.open('https://github.com/yourusername', '_blank'),
+        '1': () => loadPage('latest-post',0),
+        '2': () => loadPage('all-posts',1),
+        '3': () => tagSearch('tags'),
+        '4': () => pageSearch('search'),
+        'g': () => window.open('https://github.com/JJKVIT?tab=repositories', '_blank'),
         'r': () => window.location.href = '/resume',
-        'c': () => window.location.href = '/contact',
-        'a': () => window.location.href = '/about'
+        'c': () => window.location.href = '/about',
+        'a': () => window.location.href = '/site_info'
     };
     
     if (actions[key]) {
@@ -71,40 +83,13 @@ function handleKeyAction(key) {
     }
 }
 
-// Enhanced quit function
 function quitApplication() {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const shortcut = isMac ? 'Cmd+W' : 'Ctrl+W';
     
-    if (confirm(`Really quit? [y/N]\n\nPress ${shortcut} to close this tab`)) {
-        document.body.innerHTML = `
-            <div style="
-                color: #c0caf5; 
-                font-family: 'JetBrains Mono', monospace; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                height: 100vh; 
-                text-align: center;
-                background: #1a1b26;
-            ">
-                <div>
-                    <h2 style="color: #7aa2f7;">Thanks for visiting compErr!</h2>
-                    <p style="color: #9ece6a; margin: 20px 0;">Press ${shortcut} to close this tab</p>
-                    <p style="color: #565f89; font-size: 12px;">Or press F5 to restart</p>
-                </div>
-            </div>
-        `;
-        
-        try {
-            window.close();
-        } catch (e) {
-            console.log('Cannot close window directly due to browser security');
-        }
-    }
+    window.close();
 }
 
-// Keyboard event handling
 document.addEventListener('keydown', function(e) {
     if (isPageLoading) {
         e.preventDefault();
@@ -175,7 +160,6 @@ Other:
   q      - Quit`);
 }
 
-// Mouse support
 menuItems.forEach((item, index) => {
     item.addEventListener('mouseenter', function() {
         if (isPageLoading) return;
@@ -194,13 +178,6 @@ menuItems.forEach((item, index) => {
     });
 });
 
-// Load page function (placeholder)
-async function loadPage(page) {
-    console.log(`Loading ${page}...`);
-    // Implement your page loading logic here
-}
-
-// Prevent keyboard shortcuts during page load
 window.addEventListener('load', function() {
     setTimeout(() => {
         isPageLoading = false;
